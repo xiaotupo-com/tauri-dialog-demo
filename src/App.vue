@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ask, confirm, message, open, save } from '@tauri-apps/api/dialog';
 import { homeDir } from '@tauri-apps/api/path';
+import { exit } from '@tauri-apps/api/process';
 import { ref, Ref } from 'vue';
 
 const file_list : Ref<string[]> = ref([]);
@@ -48,14 +49,30 @@ async function testSave() {
   }
 }
 
+// 退出程序
+async function exitApp() {
+  const isExit = await confirm("您确定要退出程序吗？", {title: "退出程序", type: "info"});
+
+  if (isExit) {
+    await exit(0);
+  }
+}
+
+async function askDialog() {
+  const selectedState = await ask("选择Yes 或者 No", {title: "ask对话框", type: "info"});
+  console.log(selectedState);
+}
+
 </script>
 
 <template>
   <div class="container">
     <h1>Tauri Dialog 例子</h1>
     <el-row class="mb-4">
+      <el-button type="primary" @click="exitApp">退出程序</el-button>
       <el-button type="primary" @click="testOpen">打开对话框</el-button>
       <el-button type="primary" @click="testSave">保存文件</el-button>
+      <el-button type="primary" @click="askDialog">ask 对话框</el-button>
     </el-row>
     <p>文件路径列表：
       <ul>
@@ -63,6 +80,8 @@ async function testSave() {
       </ul>
     </p>
   </div>
+
+  <p>文件选择状态：</p>
 </template>
 
 <style scoped>
